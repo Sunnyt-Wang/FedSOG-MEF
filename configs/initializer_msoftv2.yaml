@@ -1,0 +1,17 @@
+defaults:
+  - hermessim_sog_msoftv2
+
+run_name: msoftv2
+
+paths:
+  checkpoint_dir: ${paths.output_dir}/checkpoints/initializers
+
+train:
+  batch_size: 13
+  max_steps: 30000
+  seed: 14
+  gather_distributed_loss: true
+  distributed_global_batch: true
+
+logging:
+  save_every_steps: 1000

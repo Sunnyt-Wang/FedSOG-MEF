@@ -1,0 +1,17 @@
+defaults:
+  - hermessim_sog_light
+
+run_name: lightsog
+
+paths:
+  checkpoint_dir: ${paths.output_dir}/checkpoints/initializers
+
+train:
+  batch_size: 13
+  max_steps: 30000
+  seed: 41
+  gather_distributed_loss: true
+  distributed_global_batch: true
+
+logging:
+  save_every_steps: 1000

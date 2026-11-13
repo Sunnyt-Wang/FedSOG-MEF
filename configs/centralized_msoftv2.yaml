@@ -1,0 +1,11 @@
+defaults:
+  - hermessim_sog_msoftv2
+
+run_name: centralized_msoftv2
+
+train:
+  batch_size: 13
+  max_steps: 1000
+
+logging:
+  save_every_steps: 1000

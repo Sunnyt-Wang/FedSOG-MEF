@@ -1,0 +1,15 @@
+defaults:
+  - hermessim_sog_msoftv2
+
+run_name: hermessim_sog_light
+
+model:
+  similarity_arch: light_sog
+  similarity_dim: 256
+  light_hidden_size: 96
+  light_edge_hidden_size: 16
+  light_num_layers: 3
+  light_dropout: 0.1
+
+eval:
+  batch_size: 256

@@ -1,0 +1,107 @@
+paths:
+  project_root: ${oc.env:FEDSOG_ROOT,.}
+  datasets_root: ${oc.env:FEDSOG_DATA_ROOT,./data}
+  models_root: ${paths.project_root}/models
+  output_dir: ${paths.project_root}/outputs
+  checkpoint_dir: ${paths.output_dir}/checkpoints
+  log_dir: ${paths.output_dir}/logs
+  predictions_dir: ${paths.output_dir}/predictions
+
+model:
+  # Graph-only encoders do not load an LLM; this directory satisfies path validation.
+  base_model_path: ${paths.project_root}
+  similarity_arch: gnn_msoftv2
+  image_token: <image>
+  block_num: 6
+  embed_dim: 32
+  hidden_size: 2048
+  similarity_dim: 384
+  freeze_llm: true
+  gradient_checkpointing: false
+
+ggnn:
+  encoder:
+    n_node_feat_dim: 32
+    n_edge_feat_dim: 8
+    n_node_attr: 461
+    n_edge_attr: 4
+    n_pos_enc: 8
+  args:
+    n_node_feat_dim: 32
+    n_edge_feat_dim: 8
+    layer_groups: [1, 1, 1, 1, 1, 1]
+    n_message_net_layers: 3
+    skip_mode: 0
+    output_mode: 0
+    num_query: 4
+    n_atte_layers: 0
+    layer_aggr: add
+    layer_aggr_kwargs: {}
+    concat_skip: 0
+
+train:
+  task: similarity
+  code_type: Dataset-1
+  batch_size: 2
+  n_sim_funcs: 2
+  num_workers: 0
+  shuffle: false
+  epochs: 20
+  max_steps: 500
+  lr: 1e-3
+  optimizer: adam
+  lr_scheduler: constant
+  mixed_precision: "no"
+  weight_decay: 0.0
+  warmup_ratio: 0.0
+  grad_accum_steps: 1
+  grad_clip: 10.0
+  seed: 1400
+  subset_size: -1
+  loss: cosine
+  loss_opt: circle
+  loss_margin: 0.10
+  loss_gama: 1e7
+  norm_neg_sampling_s: 1.0
+  gather_distributed_loss: false
+  distributed_global_batch: false
+  continuous_sampler_rng: true
+  graph_vec_regularizer_weight: 1e-8
+  max_num_nodes: 180000
+  max_num_edges: 360000
+
+logging:
+  log_every: 10
+  save_every_steps: 500
+  eval_every_steps: -1
+  keep_last_n: 1
+  keep_best: true
+
+eval:
+  batch_size: 100
+  subset_size: -1
+  save_predictions: true
+  rank_method: max
+  pair_csvs:
+    - ${paths.datasets_root}/Dataset-1/pairs/experiments/full/pos-xa-1000-8192_Ds1.csv
+    - ${paths.datasets_root}/Dataset-1/pairs/experiments/full/pos-xc-1000-8192_Ds1.csv
+    - ${paths.datasets_root}/Dataset-1/pairs/experiments/full/pos-xm-1000-10000_Ds1.csv
+    - ${paths.datasets_root}/Dataset-1/pairs/experiments/full/pos-xo-1000-8192_Ds1.csv
+
+data:
+  train_csv: ${paths.datasets_root}/Dataset-1/training_Dataset-1.csv
+  train_pkl: ${oc.env:FEDSOG_GRAPH_CACHE,./data/graphs/graph_func_dict.pkl}
+  validation_csv: ${paths.datasets_root}/Dataset-1/pairs/validation/validation_functions.csv
+  validation_pkl: ${data.train_pkl}
+  testing_csv: ${paths.datasets_root}/Dataset-1/testing_Dataset-1.csv
+  testing_pkl: ${data.train_pkl}
+  eval_csv: null
+  eval_pkl: null
+  source_code_pool_pkl: null
+
+prompt:
+  system: |
+    You are a binary similarity model. Encode the semantics-oriented graph into a function embedding.
+  user_prefix: "Represent this SOG for binary code similarity:\n"
+  num_classes: 0
+  max_target_length: 8

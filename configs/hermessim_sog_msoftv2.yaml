@@ -1,0 +1,13 @@
+defaults:
+  - base
+
+run_name: hermessim_sog_msoftv2
+
+model:
+  similarity_arch: gnn_msoftv2
+  similarity_dim: 384
+  msoft_num_queries: 6
+  msoft_hidden_channels: 64
+  msoft_node_trans: 1
+  msoft_aggr_trans: 1
+  msoft_q_scale: 1.0
